@@ -33,6 +33,10 @@ class ServerModel with ChangeNotifier {
   bool _showElevation = false;
   bool _hideCm = false;
   bool get hideCm => _hideCm;
+  set hideCm(bool value) {
+    _hideCm = value;
+    notifyListeners();
+  }
   int _connectStatus = 0; // Rendezvous Server status
   String _verificationMethod = "";
   String _temporaryPasswordLength = "";
