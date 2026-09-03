@@ -1458,7 +1458,7 @@ class _SafetyState extends State<_Safety> with AutomaticKeepAliveClientMixin {
     return ChangeNotifierProvider.value(
         value: gFFI.serverModel,
         child: Consumer<ServerModel>(builder: (context, model, child) {
-          final enableHideCm = model.approveMode == 'password' &&
+          final enableHideCm = model.approveMode != 'click' &&
               (model.verificationMethod == kUsePermanentPassword ||
                   model.verificationMethod == kUseBothPasswords);
           onHideCmChanged(bool? b) {
