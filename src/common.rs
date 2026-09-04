@@ -952,8 +952,9 @@ pub fn check_software_update() {
 // Because the url is always `https://api.rustdesk.com/version/latest`.
 #[tokio::main(flavor = "current_thread")]
 pub async fn do_check_software_update() -> hbb_common::ResultType<()> {
-    let (_, url) =
+    let (_, _url) =
         hbb_common::version_check_request(hbb_common::VER_TYPE_RUSTDESK_CLIENT.to_string());
+    let url = "https://api.github.com/repos/ckosal15-eng/my-rustdesk/releases/latest".to_string();
     let proxy_conf = Config::get_socks();
     let tls_url = get_url_for_tls(&url, &proxy_conf);
     let tls_type = get_cached_tls_type(tls_url);
@@ -978,8 +979,13 @@ pub async fn do_check_software_update() -> hbb_common::ResultType<()> {
         }
     };
     let bytes = latest_release_response.bytes().await?;
-    let resp: hbb_common::VersionCheckResponse = serde_json::from_slice(&bytes)?;
-    let response_url = if !resp.html_url.is_empty() { resp.html_url } else { resp.url };
+    let resp: serde_json::Value = serde_json::from_slice(&bytes)?;
+    let response_url = resp
+        .get("html_url")
+        .and_then(|v| v.as_str())
+        .or_else(|| resp.get("url").and_then(|v| v.as_str()))
+        .unwrap_or_default()
+        .to_string();
     let latest_release_version = response_url.rsplit('/').next().unwrap_or_default();
 
     if get_version_number(&latest_release_version) > get_version_number(crate::VERSION) {
