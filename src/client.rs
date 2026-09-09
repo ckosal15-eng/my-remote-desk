@@ -3326,7 +3326,7 @@ struct LoginErrorMsgBox {
 
 lazy_static::lazy_static! {
     static ref LOGIN_ERROR_MAP: Arc<HashMap<&'static str, LoginErrorMsgBox>> = {
-        use config::LINK_HEADLESS_LINUX_SUPPORT;
+        const LINK_HEADLESS_LINUX_SUPPORT: &str = "https://rustdesk.com/docs/en/manual/linux/#login-screen";
         let map = HashMap::from([(LOGIN_SCREEN_WAYLAND, LoginErrorMsgBox{
             msgtype: "error",
             title: "Login Error",
