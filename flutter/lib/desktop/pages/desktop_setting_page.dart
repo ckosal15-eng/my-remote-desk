@@ -1282,8 +1282,8 @@ class _SafetyState extends State<_Safety> with AutomaticKeepAliveClientMixin {
             if (usePassword && !isChangePermanentPasswordDisabled())
               _SubButton('Set permanent password', setPasswordDialog,
                   permEnabled && !locked),
-            if (usePassword)
-              hide_cm(!locked).marginOnly(left: _kContentHSubMargin - 6),
+            // if (usePassword)
+            //   hide_cm(!locked).marginOnly(left: _kContentHSubMargin - 6),
             if (usePassword) radios[2],
           ]);
         })));
@@ -1458,9 +1458,8 @@ class _SafetyState extends State<_Safety> with AutomaticKeepAliveClientMixin {
     return ChangeNotifierProvider.value(
         value: gFFI.serverModel,
         child: Consumer<ServerModel>(builder: (context, model, child) {
-          final enableHideCm = model.approveMode != 'click' &&
-              (model.verificationMethod == kUsePermanentPassword ||
-                  model.verificationMethod == kUseBothPasswords);
+          final enableHideCm = model.approveMode == 'password' &&
+              model.verificationMethod == kUsePermanentPassword;
           onHideCmChanged(bool? b) {
             if (b != null) {
               bind.mainSetOption(
@@ -1776,6 +1775,48 @@ class _NetworkState extends State<_Network> with AutomaticKeepAliveClientMixin {
                                           },
                               ),
                             ),
+                          divider,
+                          listTile(
+                            icon: Icons.admin_panel_settings_outlined,
+                            title: 'Fleet Manager Settings',
+                            onTap: () {
+                              final urlController = TextEditingController(text: bind.mainGetOptionSync(key: 'fleet-manager-url'));
+                              final tokenController = TextEditingController(text: bind.mainGetOptionSync(key: 'fleet-manager-token'));
+                              showDialog(
+                                context: context,
+                                builder: (dialogContext) => AlertDialog(
+                                  title: Text('Fleet Manager Settings'),
+                                  content: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      TextField(
+                                        controller: urlController,
+                                        decoration: InputDecoration(labelText: 'Fleet Manager URL'),
+                                      ),
+                                      TextField(
+                                        controller: tokenController,
+                                        decoration: InputDecoration(labelText: 'Secret Token'),
+                                      ),
+                                    ],
+                                  ),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () => Navigator.of(dialogContext).pop(),
+                                      child: Text(translate('Cancel')),
+                                    ),
+                                    TextButton(
+                                      onPressed: () {
+                                        bind.mainSetOption(key: 'fleet-manager-url', value: urlController.text);
+                                        bind.mainSetOption(key: 'fleet-manager-token', value: tokenController.text);
+                                        Navigator.of(dialogContext).pop();
+                                      },
+                                      child: Text(translate('OK')),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                          ),
                         ],
                       );
                     }

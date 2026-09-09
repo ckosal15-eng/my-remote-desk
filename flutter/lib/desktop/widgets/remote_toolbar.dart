@@ -984,22 +984,17 @@ class _MonitorCycle {
 
   PeerInfo get _pi => ffi.ffiModel.pi;
   int get total => _pi.displays.length;
-  int get current => CurrentDisplayState.find(id).value;
-  bool get _inRange => current >= 0 && current < total;
+  int get _current => CurrentDisplayState.find(id).value;
+  bool get _inRange => _current >= 0 && _current < total;
 
-  String get label => _inRange ? '${current + 1}' : '*';
+  String get label => _inRange ? '${_current + 1}' : '*';
   String get tooltip => '${translate('Switch display')} ($label/$total)';
 
   void next() {
     final t = total;
     if (t < 2) return;
-    final from = _inRange ? current : -1;
+    final from = _inRange ? _current : -1;
     final target = (from + 1) % t;
-    switchTo(target);
-  }
-
-  void switchTo(int target) {
-    if (target < 0 || target >= total) return;
     final isChooseDisplayToOpenInNewWindow = _pi.isSupportMultiDisplay &&
         bind.sessionGetDisplaysAsIndividualWindows(sessionId: ffi.sessionId) ==
             'Y';
@@ -3352,7 +3347,7 @@ class _DraggableShowHideState extends State<_DraggableShowHide> {
       children: [
         _buildDraggable(context),
         Obx(() => collapse.isTrue
-            ? _MinimizedMonitorSwitchButton(id: widget.id, ffi: widget.ffi, isHorizontal: widget.isHorizontal)
+            ? _MinimizedMonitorSwitchButton(id: widget.id, ffi: widget.ffi)
             : const Offstage()),
         Obx(() => buttonWrapper(
               () {
@@ -3518,13 +3513,11 @@ class EdgeThicknessControl extends StatelessWidget {
 class _MinimizedMonitorSwitchButton extends StatelessWidget {
   final String id;
   final FFI ffi;
-  final bool isHorizontal;
 
   const _MinimizedMonitorSwitchButton({
     Key? key,
     required this.id,
     required this.ffi,
-    required this.isHorizontal,
   }) : super(key: key);
 
   @override
@@ -3533,6 +3526,7 @@ class _MinimizedMonitorSwitchButton extends StatelessWidget {
     final cycle = _MonitorCycle(id, ffi);
 
     return Obx(() {
+      final label = cycle.label;
       if (!mainGetLocalBoolOptionSync(kOptionAllowMonitorSwitchMainToolbar) ||
           !mainGetLocalBoolOptionSync(kOptionAllowMonitorSwitchMinToolbar)) {
         return const Offstage();
@@ -3545,57 +3539,42 @@ class _MinimizedMonitorSwitchButton extends StatelessWidget {
         return const Offstage();
       }
 
-      final children = <Widget>[];
-      for (int i = 0; i < cycle.total; i++) {
-        final isActive = cycle.current == i;
-        children.add(
-          Tooltip(
-            message: '${translate('Switch display')} (${i + 1}/${cycle.total})',
-            child: TextButton(
-              onPressed: () => cycle.switchTo(i),
-              style: ButtonStyle(
-                minimumSize: MaterialStateProperty.all(const Size(0, 0)),
-                padding: MaterialStateProperty.all(EdgeInsets.zero),
-                backgroundColor: MaterialStateProperty.resolveWith((states) {
-                  if (states.contains(MaterialState.hovered)) {
-                    return _ToolbarTheme.blueColor.withOpacity(0.15);
-                  }
-                  if (isActive) {
-                    return _ToolbarTheme.blueColor.withOpacity(0.3);
-                  }
-                  return null;
-                }),
-              ),
-              child: Stack(
-                alignment: const Alignment(0, -0.125),
-                children: [
-                  SvgPicture.asset(
-                    'assets/display_switcher.svg',
-                    colorFilter: ColorFilter.mode(
-                        isActive ? _ToolbarTheme.blueColor : _ToolbarTheme.inactiveColor,
-                        BlendMode.srcIn),
-                    width: iconSize,
-                    height: iconSize,
-                  ),
-                  Text(
-                    '${i + 1}',
-                    style: TextStyle(
-                      color: isActive ? Colors.white : Colors.grey,
-                      fontSize: 9,
-                      height: 1,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-            ),
+      return Tooltip(
+        message: cycle.tooltip,
+        child: TextButton(
+          onPressed: cycle.next,
+          style: ButtonStyle(
+            minimumSize: MaterialStateProperty.all(const Size(0, 0)),
+            padding: MaterialStateProperty.all(EdgeInsets.zero),
+            backgroundColor: MaterialStateProperty.resolveWith((states) {
+              if (states.contains(MaterialState.hovered)) {
+                return _ToolbarTheme.blueColor.withOpacity(0.15);
+              }
+              return null;
+            }),
           ),
-        );
-      }
-      return Flex(
-        direction: isHorizontal ? Axis.horizontal : Axis.vertical,
-        mainAxisSize: MainAxisSize.min,
-        children: children,
+          child: Stack(
+            alignment: const Alignment(0, -0.125),
+            children: [
+              SvgPicture.asset(
+                'assets/display_switcher.svg',
+                colorFilter:
+                    ColorFilter.mode(_ToolbarTheme.blueColor, BlendMode.srcIn),
+                width: iconSize,
+                height: iconSize,
+              ),
+              Text(
+                label,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 9,
+                  height: 1,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+        ),
       );
     });
   }

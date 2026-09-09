@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RustDesk Fleet Manager</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #f3f4f6; padding: 20px; }
+        .container { max-width: 1000px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        h1 { color: #1f2937; border-bottom: 1px solid #e5e7eb; padding-bottom: 10px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { text-align: left; padding: 12px; border-bottom: 1px solid #e5e7eb; }
+        th { background-color: #f9fafb; font-weight: 600; color: #4b5563; }
+        tr:hover { background-color: #f9fafb; }
+        .status-online { color: #10b981; font-weight: bold; }
+        .status-offline { color: #6b7280; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>RustDesk Fleet Manager</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>Device ID</th>
+                    <th>Hostname</th>
+                    <th>OS</th>
+                    <th>Status</th>
+                    <th>Last Seen</th>
+                </tr>
+            </thead>
+            <tbody id="devices-body">
+                <tr><td colspan="5">Loading devices...</td></tr>
+            </tbody>
+        </table>
+    </div>
+    <script>
+        async function fetchDevices() {
+            try {
+                // The browser will automatically prompt for basic auth or use cached credentials
+                const response = await fetch('/api/devices');
+                if (response.status === 401) {
+                    document.getElementById('devices-body').innerHTML = '<tr><td colspan="5">Unauthorized. Please reload and login.</td></tr>';
+                    return;
+                }
+                const devices = await response.json();
+                const tbody = document.getElementById('devices-body');
+                tbody.innerHTML = '';
+                
+                const now = Math.floor(Date.now() / 1000);
+                
+                if (devices.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5">No devices found.</td></tr>';
+                    return;
+                }
+                
+                devices.forEach(d => {
+                    const tr = document.createElement('tr');
+                    
+                    // Consider online if seen within last 2 minutes (120 seconds)
+                    const isOnline = (now - d.last_seen) < 120;
+                    const statusClass = isOnline ? 'status-online' : 'status-offline';
+                    const statusText = isOnline ? 'Online' : 'Offline';
+                    
+                    const date = new Date(d.last_seen * 1000).toLocaleString();
+                    
+                    tr.innerHTML = `
+                        <td>${d.id}</td>
+                        <td>${d.hostname}</td>
+                        <td>${d.os}</td>
+                        <td class="${statusClass}">${statusText}</td>
+                        <td>${date}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } catch (e) {
+                console.error(e);
+            }
+        }
+        
+        fetchDevices();
+        setInterval(fetchDevices, 10000); // Refresh every 10s
+    </script>
+</body>
+</html>

@@ -861,13 +861,12 @@ async fn handle(data: Data, stream: &mut Connection) {
                         None
                     };
                 } else if name == "hide_cm" {
-                    let hide = if crate::hbbs_http::sync::is_pro() || crate::common::is_custom_client()
+                    value = if crate::hbbs_http::sync::is_pro() || crate::common::is_custom_client()
                     {
-                        hbb_common::password_security::hide_cm()
+                        Some(hbb_common::password_security::hide_cm().to_string())
                     } else {
-                        false
-                    } || Config::get_option("allow-hide-cm") == "Y";
-                    value = Some(hide.to_string());
+                        None
+                    };
                 } else if name == "voice-call-input" {
                     value = crate::audio_service::get_voice_call_input_device();
                 } else if name == "unlock-pin" {
