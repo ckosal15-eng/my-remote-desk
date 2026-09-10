@@ -79,16 +79,35 @@ pub fn restart() {
 mod pa_impl {
     use super::*;
 
+    enum AlignedData {
+        Vec(Vec<u8>),
+        Aligned(hbb_common::mem::AlignedU8Vec),
+    }
+
+    impl AlignedData {
+        fn as_ptr(&self) -> *const u8 {
+            match self {
+                Self::Vec(v) => v.as_ptr(),
+                Self::Aligned(v) => v.as_ptr(),
+            }
+        }
+        fn len(&self) -> usize {
+            match self {
+                Self::Vec(v) => v.len(),
+                Self::Aligned(v) => v.len(),
+            }
+        }
+    }
+
     // SAFETY: constrains of hbb_common::mem::aligned_u8_vec must be held
-    unsafe fn align_to_32(data: Vec<u8>) -> Vec<u8> {
+    unsafe fn align_to_32(data: Vec<u8>) -> AlignedData {
         if (data.as_ptr() as usize & 3) == 0 {
-            return data;
+            return AlignedData::Vec(data);
         }
 
-        let mut buf = vec![];
-        buf = unsafe { hbb_common::mem::aligned_u8_vec(data.len(), 4) };
+        let mut buf = hbb_common::mem::aligned_u8_vec(data.len(), 4);
         buf.extend_from_slice(data.as_ref());
-        buf
+        AlignedData::Aligned(buf)
     }
 
     #[tokio::main(flavor = "current_thread")]
