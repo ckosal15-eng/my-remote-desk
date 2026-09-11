@@ -967,7 +967,7 @@ pub fn main_get_error() -> String {
 
 pub fn main_show_option(_key: String) -> SyncReturn<bool> {
     #[cfg(target_os = "linux")]
-    if _key.eq(config::keys::OPTION_ALLOW_LINUX_HEADLESS) {
+    if _key.eq("allow_linux_headless") {
         return SyncReturn(true);
     }
     SyncReturn(false)

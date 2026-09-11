@@ -5,7 +5,7 @@ use hbb_common::{
     allow_err,
     anyhow::anyhow,
     bail,
-    config::{keys::OPTION_ALLOW_LINUX_HEADLESS, Config},
+    config::{Config},
     libc::{c_char, c_int, c_long, c_uint, c_ulong, c_void},
     log,
     message_proto::{DisplayInfo, Resolution},
@@ -199,7 +199,7 @@ pub struct xcb_xfixes_get_cursor_image {
 
 #[inline]
 pub fn is_headless_allowed() -> bool {
-    Config::get_option(OPTION_ALLOW_LINUX_HEADLESS) == "Y"
+    Config::get_option("allow_linux_headless") == "Y"
 }
 
 #[inline]
