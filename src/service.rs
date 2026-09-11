@@ -1,3 +1,4 @@
+#[allow(unused_imports)]
 use librustdesk::*;
 
 #[cfg(not(target_os = "macos"))]

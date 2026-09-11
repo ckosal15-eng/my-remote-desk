@@ -271,6 +271,7 @@ async fn do_download(
     Ok(is_all_downloaded)
 }
 
+#[allow(dead_code)]
 pub fn get_download_data(id: &str) -> ResultType<DownloadData> {
     let downloaders = DOWNLOADERS.lock().unwrap();
     if let Some(downloader) = downloaders.get(id) {
@@ -296,6 +297,7 @@ pub fn get_download_data(id: &str) -> ResultType<DownloadData> {
     }
 }
 
+#[allow(dead_code)]
 pub fn cancel(id: &str) {
     if let Some(downloader) = DOWNLOADERS.lock().unwrap().get(id) {
         // downloader.is_canceled.store(true, Ordering::SeqCst);
@@ -304,6 +306,7 @@ pub fn cancel(id: &str) {
     }
 }
 
+#[allow(dead_code)]
 pub fn remove(id: &str) {
     let _ = DOWNLOADERS.lock().unwrap().remove(id);
 }
