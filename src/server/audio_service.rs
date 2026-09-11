@@ -159,14 +159,18 @@ mod pa_impl {
 
             #[cfg(target_os = "android")]
             if scrap::android::ffi::get_audio_raw(&mut android_data, &mut vec![]).is_some() {
+                let aligned = unsafe { align_to_32(std::mem::take(&mut android_data)) };
                 let data = unsafe {
-                    android_data = align_to_32(android_data);
                     std::slice::from_raw_parts::<f32>(
-                        android_data.as_ptr() as _,
-                        android_data.len() / 4,
+                        aligned.as_ptr() as _,
+                        aligned.len() / 4,
                     )
                 };
                 send_f32(data, &mut encoder, &sp);
+                if let AlignedData::Vec(v) = aligned {
+                    android_data = v;
+                    android_data.clear();
+                }
             } else {
                 hbb_common::sleep(0.1).await;
             }
