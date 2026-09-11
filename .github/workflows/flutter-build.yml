@@ -1520,6 +1520,7 @@ jobs:
             --volume "/opt/artifacts:/opt/artifacts"
           shell: /bin/bash
           install: |
+            sed -i -e 's/archive.ubuntu.com/old-releases.ubuntu.com/g' -e 's/security.ubuntu.com/old-releases.ubuntu.com/g' -e 's/ports.ubuntu.com/old-releases.ubuntu.com/g' /etc/apt/sources.list || true
             apt-get update -y
             echo -e "installing deps"
             apt-get install -y \
@@ -1801,6 +1802,7 @@ jobs:
             --volume "${PWD}:/workspace"
           shell: /bin/bash
           install: |
+            sed -i -e 's/archive.ubuntu.com/old-releases.ubuntu.com/g' -e 's/security.ubuntu.com/old-releases.ubuntu.com/g' -e 's/ports.ubuntu.com/old-releases.ubuntu.com/g' /etc/apt/sources.list || true
             apt-get update
             apt-get install -y \
                build-essential \
@@ -2062,6 +2064,7 @@ jobs:
             --volume "${PWD}:/workspace"
           shell: /bin/bash
           install: |
+            sed -i -e 's/archive.ubuntu.com/old-releases.ubuntu.com/g' -e 's/security.ubuntu.com/old-releases.ubuntu.com/g' -e 's/ports.ubuntu.com/old-releases.ubuntu.com/g' /etc/apt/sources.list || true
             apt-get update -y
             apt-get install -y git flatpak flatpak-builder
           run: |
