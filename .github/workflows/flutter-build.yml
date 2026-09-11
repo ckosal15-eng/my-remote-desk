@@ -412,14 +412,10 @@ jobs:
         with:
           version: ${{ env.LLVM_VERSION }}
 
-      - name: Force install 32-bit Rust toolchain
-        run: rustup toolchain install nightly-2023-10-13-${{ matrix.job.target }} --force-non-host --profile minimal
-        
       - name: Install Rust toolchain
-        uses: dtolnay/rust-toolchain@e97e2d8cc328f1b50210efc529dca0028893a2d9 # v1
-        with:
-          toolchain: nightly-2023-10-13-${{ matrix.job.target }} # must use nightly here, because of abi_thiscall feature required
-          components: "rustfmt"
+        run: |
+          rustup toolchain install nightly-2023-10-13-${{ matrix.job.target }} --force-non-host --profile minimal --component rustfmt
+          rustup default nightly-2023-10-13-${{ matrix.job.target }}
 
       - uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32 # v2
         with:
@@ -1831,7 +1827,8 @@ jobs:
                ninja-build \
                pkg-config \
                python3 \
-               python3.7 \
+               python3-pip \
+               libdrm-dev \
                rpm \
                unzip \
                wget \
@@ -1886,8 +1883,6 @@ jobs:
           run: |
             # disable git safe.directory
             git config --global --add safe.directory "*"
-            # set python3.7 as default python3
-            update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.7 1
             # add built CMake to PATH and set VCPKG_FORCE_SYSTEM_BINARIES Afor arm-linux
             if [ "${{ matrix.job.vcpkg-triplet }}" = "arm-linux" ]; then
               export PATH="/opt/cmake-${{ env.SCITER_ARMV7_CMAKE_VERSION }}-linux-armhf/bin:$PATH"
