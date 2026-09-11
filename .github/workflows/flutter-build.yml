@@ -1396,7 +1396,7 @@ jobs:
           - {
               arch: x86_64,
               target: x86_64-unknown-linux-gnu,
-              distro: ubuntu18.04,
+              distro: ubuntu20.04,
               on: ubuntu-22.04,
               deb_arch: amd64,
               vcpkg-triplet: x64-linux,
@@ -1404,7 +1404,7 @@ jobs:
           - {
               arch: aarch64,
               target: aarch64-unknown-linux-gnu,
-              distro: ubuntu18.04,
+              distro: ubuntu20.04,
               on: ubuntu-22.04-arm,
               deb_arch: arm64,
               vcpkg-triplet: arm64-linux,
@@ -1520,7 +1520,6 @@ jobs:
             --volume "/opt/artifacts:/opt/artifacts"
           shell: /bin/bash
           install: |
-            sed -i -e 's/archive.ubuntu.com/old-releases.ubuntu.com/g' -e 's/security.ubuntu.com/old-releases.ubuntu.com/g' -e 's/ports.ubuntu.com/old-releases.ubuntu.com/g' /etc/apt/sources.list || true
             apt-get update -y
             echo -e "installing deps"
             apt-get install -y \
@@ -1735,7 +1734,7 @@ jobs:
               arch: x86_64,
               target: x86_64-unknown-linux-gnu,
               on: ubuntu-22.04,
-              distro: ubuntu18.04,
+              distro: ubuntu20.04,
               deb_arch: amd64,
               sciter_arch: x64,
               vcpkg-triplet: x64-linux,
@@ -1745,7 +1744,7 @@ jobs:
               arch: armv7,
               target: armv7-unknown-linux-gnueabihf,
               on: ubuntu-22.04-arm,
-              distro: ubuntu18.04-rustdesk,
+              distro: ubuntu20.04-rustdesk,
               deb_arch: armhf,
               sciter_arch: arm32,
               vcpkg-triplet: arm-linux,
@@ -1802,7 +1801,6 @@ jobs:
             --volume "${PWD}:/workspace"
           shell: /bin/bash
           install: |
-            sed -i -e 's/archive.ubuntu.com/old-releases.ubuntu.com/g' -e 's/security.ubuntu.com/old-releases.ubuntu.com/g' -e 's/ports.ubuntu.com/old-releases.ubuntu.com/g' /etc/apt/sources.list || true
             apt-get update
             apt-get install -y \
                build-essential \
@@ -2064,7 +2062,6 @@ jobs:
             --volume "${PWD}:/workspace"
           shell: /bin/bash
           install: |
-            sed -i -e 's/archive.ubuntu.com/old-releases.ubuntu.com/g' -e 's/security.ubuntu.com/old-releases.ubuntu.com/g' -e 's/ports.ubuntu.com/old-releases.ubuntu.com/g' /etc/apt/sources.list || true
             apt-get update -y
             apt-get install -y git flatpak flatpak-builder
           run: |
