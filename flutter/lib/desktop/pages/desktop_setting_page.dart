@@ -1987,7 +1987,7 @@ class _DisplayState extends State<_Display> {
 
     final groupValue =
         bind.mainGetUserDefaultOption(key: kOptionCodecPreference);
-    var hwRadios = [];
+    final hwRadios = <Widget>[];
     final isOptFixed = isOptionFixed(kOptionCodecPreference);
     try {
       final Map codecsJson = jsonDecode(bind.mainSupportedHwdecodings());
@@ -2010,7 +2010,7 @@ class _DisplayState extends State<_Display> {
     } catch (e) {
       debugPrint("failed to parse supported hwdecodings, err=$e");
     }
-    return _Card(title: 'Default Codec', children: [
+    return _Card(title: 'Default Codec', children: <Widget>[
       _Radio(context,
           value: 'auto',
           groupValue: groupValue,
@@ -2060,7 +2060,7 @@ class _DisplayState extends State<_Display> {
     }
     return _Card(
       title: 'Privacy mode',
-      children: privacyModeImpls.map((impl) {
+      children: privacyModeImpls.map<Widget>((impl) {
         final d = impl as List<dynamic>;
         return _Radio(context,
             value: d[0] as String,
@@ -2402,7 +2402,7 @@ class __PrinterState extends State<_Printer> {
     }
 
     PrinterOptions printerOptions = PrinterOptions.load();
-    return _Card(title: 'Incoming Print Jobs', children: [
+    return _Card(title: 'Incoming Print Jobs', children: <Widget>[
       _Radio(context,
           value: kValuePrinterIncomingJobDismiss,
           groupValue: printerOptions.action,
